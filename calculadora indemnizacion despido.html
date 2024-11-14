@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Indemnización por Despido</title>
+  <!-- Estilos CSS -->
+  <style>
+    /* Estilos para el formulario */
+    form {
+      max-width: 400px;
+      margin: 20px auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-family: Arial, sans-serif;
+    }
+
+    label {
+      margin-bottom: 5px;
+      display: block;
+      font-weight: bold;
+    }
+
+    input, select, button {
+      display: block;
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 10px;
+      font-size: 1em;
+    }
+
+    button {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #resultado {
+      max-width: 400px;
+      margin: 20px auto;
+      padding: 10px;
+      font-size: 1.1em;
+      color: #333;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <!-- Formulario HTML -->
+  <form id="calculadora-indemnizacion">
+    <label for="salario">Salario bruto:</label>
+    <input type="number" id="salario" name="salario" required placeholder="Ejemplo: 30000">
+
+    <label for="tipo-salario">Tipo de salario:</label>
+    <select id="tipo-salario" name="tipo-salario" required>
+      <option value="anual">Anual</option>
+      <option value="mensual">Mensual</option>
+      <option value="diario">Diario</option>
+    </select>
+
+    <label for="fecha-inicio">Fecha de inicio del contrato:</label>
+    <input type="date" id="fecha-inicio" name="fecha-inicio" required>
+
+    <label for="fecha-fin">Fecha de fin del contrato:</label>
+    <input type="date" id="fecha-fin" name="fecha-fin" required>
+
+    <label for="tipo-despido">Tipo de despido:</label>
+    <select id="tipo-despido" name="tipo-despido" required>
+      <option value="improcedente">Improcedente</option>
+      <option value="objetivo">Objetivo</option>
+    </select>
+
+    <button type="submit">Calcular Indemnización</button>
+  </form>
+
+  <div id="resultado"></div>
+
+  <!-- Lógica JavaScript -->
+  <script>
+    // Función personalizada para formatear el número en formato español
+    function formatearNumero(numero) {
+      const partes = numero.toFixed(2).split('.'); // Separa la parte entera de los decimales
+      partes[0] = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.'); // Agrega punto cada tres dígitos
+      return partes.join(','); // Une la parte entera con los decimales usando coma
+    }
+
+    document.getElementById('calculadora-indemnizacion').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      // Obtener valores del formulario
+      const salario = parseFloat(document.getElementById('salario').value);
+      const tipoSalario = document.getElementById('tipo-salario').value;
+      const fechaInicio = new Date(document.getElementById('fecha-inicio').value);
+      const fechaFin = new Date(document.getElementById('fecha-fin').value);
+      const tipoDespido = document.getElementById('tipo-despido').value;
+
+      // Validar los valores para evitar cálculos incorrectos
+      if (isNaN(salario) || fechaInicio >= fechaFin) {
+        document.getElementById('resultado').innerText = "Por favor, revisa los datos ingresados.";
+        return;
+      }
+
+      // Definir días de indemnización por año según el tipo de despido
+      const diasPorAno = tipoDespido === 'improcedente' ? 33 : 20;
+
+      // Calcular la antigüedad en años
+      const antiguedadEnDias = (fechaFin - fechaInicio) / (1000 * 60 * 60 * 24);
+      const antiguedadEnAnos = antiguedadEnDias / 365;
+
+      // Convertir el salario a salario diario en función del tipo seleccionado
+      let salarioDiario;
+      if (tipoSalario === 'anual') {
+        salarioDiario = salario / 365;
+      } else if (tipoSalario === 'mensual') {
+        salarioDiario = (salario * 12) / 365;
+      } else if (tipoSalario === 'diario') {
+        salarioDiario = salario;
+      }
+
+      // Calcular la indemnización
+      const indemnizacion = salarioDiario * diasPorAno * antiguedadEnAnos;
+
+      // Formatear el resultado en el formato solicitado (miles con punto, decimales con coma y euro al final)
+      const indemnizacionFormateada = formatearNumero(indemnizacion) + ' €';
+
+      // Mostrar el resultado
+      document.getElementById('resultado').innerText = `La indemnización estimada es: ${indemnizacionFormateada}`;
+    });
+  </script>
+</body>
+</html>
