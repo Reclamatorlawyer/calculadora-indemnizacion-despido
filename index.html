@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Indemnización por Despido</title>
   <!-- Estilos CSS -->
   <style>
     /* Estilos para el formulario */
@@ -171,7 +172,16 @@
       // Mostrar el resultado
       document.getElementById('resultado').innerText = `La indemnización estimada es: ${indemnizacionFormateada}`;
     });
+
+    // Ajuste de altura automática cuando se carga en un iframe
+    if (window !== window.top) {
+      window.addEventListener('load', function() {
+        const altura = document.body.scrollHeight;
+        window.parent.postMessage({ altura }, '*');
+      });
+    }
   </script>
 </body>
 </html>
+
 
